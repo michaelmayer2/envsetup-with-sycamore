@@ -15,7 +15,7 @@ There is a number of additional complexities involved:
 
 Those complexities can be solved by observing that within Sycamore the execution environment contains an environment variable `SYCAMORE_TOKEN`.
 
-A problem that remains to be solved is the automatic detection which environment the code runs. This needs to currently be set manually, but there surely must be a way to auto-detect this. If that was possible, a sample script could be written and automatically run before each code within the deliverable. 
+The `_envsetup.yml` is trying to detect which environment we are running under by inspecting the current work directory. 
 
 ## How to use
 
@@ -29,7 +29,7 @@ Every piece of R code the user writes, needs to contain the following lines
 library(envsetup)
 
 # Load the configuration
-envsetup_config <- config::get(file = "_envsetup.yml", config = "dev")
+envsetup_config <- config::get(file = "_envsetup.yml")
 
 # Apply the configuration to your R session
 rprofile(envsetup_config)

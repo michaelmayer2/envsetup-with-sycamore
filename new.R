@@ -18,48 +18,38 @@ deliverable <- "deliverable_1"
 # Base folder of deliverable 
 base_folder <- paste("Programming",compound,study,deliverable,sep="/") 
 
-# There is three envs, dev, preprod and production (empty string)
-envs <- c("dev","preprod","")
-
 # Each deliverable has its own folder names
 deliverable_folder_names <-c("adam","adadata","docs","external","macros","output","programs","rand","sdtm","srcdata")
 
-# Finally, let's put everything together
-final_folder_names <- lapply(envs, function(env) {
-  paste(if(env == "dev") { paste(base_folder,env,Sys.getenv("USER"),sep="_") } else if (env == "preprod") { paste(base_folder,env,sep="_") } else { paste(base_folder,env,sep="/") }, deliverable_folder_names, sep="/")
-})
-
-# Create temporary directory for demonstration
+# Create _envsetup.yml file in current directory
 dir <- "."
 config_path <- file.path(dir, "_envsetup.yml")
 
-yaml_content <- lapply(1:3, function(env_idx) {
-    env_name <- if(envs[env_idx] == "") "prod" else envs[env_idx]
+yaml_content <- {
+    env_name <- "default"
     
     # Create the paths section
     paths_section <- c(sapply(1:length(deliverable_folder_names), function(i) {
-        paste0("    ", deliverable_folder_names[i], ": !expr dir <- \"", final_folder_names[[env_idx]][i], "\"; if (Sys.getenv(\"SYCAMORE_TOKEN\")!=\"\") { file.path(\"",base_folder_sycamore,"\", dir) } else { file.path(\"",base_folder_rstudio,"\", dir) }")
-    })
-)
+        paste0("    ", deliverable_folder_names[i], ": !expr env_test<-paste0(\"dev_\",Sys.getenv(\"USER\"),\"/\"); if (grepl(env_test,getwd())) {env=paste0(\"_\",env_test)} else if (grepl(\"preprod/\",getwd())) {env=\"_preprod/\"} else { env=\"\" }; if (env != \"\") { dir <- paste0(\"", base_folder, "\",env,\"/",deliverable_folder_names[i],"\") } else { dir <- paste0(\"", base_folder, "\",env,\"/",deliverable_folder_names[i],"\") }; if (Sys.getenv(\"SYCAMORE_TOKEN\")!=\"\") { file.path(\"",base_folder_sycamore,"\", dir) } else { file.path(\"",base_folder_rstudio,"\", dir) }")
+    }))
+
     
     # Combine environment header with paths
     c(paste0(env_name, ":"),
       "  paths:",
       paths_section)
-})
+}
 
 # Write a basic config file
 file_conn <- file(config_path)
 
 # Print the result
 writeLines(
-    c(
-        "default:",
-        "  paths:",
-    unlist(yaml_content)
-    ),
-    file_conn
+    unlist(yaml_content),file_conn
 )
 
 # Close the file connection
 close(file_conn)
+
+
+env_test<-paste0("dev_",Sys.getenv("USER"),"/"); if (grepl(env_test,getwd())) {env=env_test} else if (grepl("preprod/",getwd())) {env="preprod/"} else { env="" }
