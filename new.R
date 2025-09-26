@@ -1,8 +1,10 @@
 # base folder during Sycamore execution
 base_folder_sycamore <- "/data/dss/genmabdev"
+base_folder_sycamore <- "data"
 
 # base folder in R Studio
 base_folder_rstudio <- "/cdrdata"
+base_folder_rstudio <- "data"
 
 # Compound Name
 compound <- "compound_1"
@@ -24,7 +26,7 @@ deliverable_folder_names <-c("adam","adadata","docs","external","macros","output
 
 # Finally, let's put everything together
 final_folder_names <- lapply(envs, function(env) {
-  paste(base_folder, if(env == "dev") { paste(env,Sys.getenv("USER"),sep="_") } else { env }, deliverable_folder_names, sep="/")
+  paste(if(env == "dev") { paste(base_folder,env,Sys.getenv("USER"),sep="_") } else if (env == "preprod") { paste(base_folder,env,sep="_") } else { paste(base_folder,env,sep="/") }, deliverable_folder_names, sep="/")
 })
 
 # Create temporary directory for demonstration
@@ -35,9 +37,10 @@ yaml_content <- lapply(1:3, function(env_idx) {
     env_name <- if(envs[env_idx] == "") "prod" else envs[env_idx]
     
     # Create the paths section
-    paths_section <- sapply(1:length(deliverable_folder_names), function(i) {
+    paths_section <- c(sapply(1:length(deliverable_folder_names), function(i) {
         paste0("    ", deliverable_folder_names[i], ": !expr dir <- \"", final_folder_names[[env_idx]][i], "\"; if (Sys.getenv(\"SYCAMORE_TOKEN\")!=\"\") { file.path(\"",base_folder_sycamore,"\", dir) } else { file.path(\"",base_folder_rstudio,"\", dir) }")
     })
+)
     
     # Combine environment header with paths
     c(paste0(env_name, ":"),
