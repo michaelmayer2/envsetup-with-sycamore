@@ -19,7 +19,7 @@ deliverable <- "deliverable_1"
 base_folder <- paste("Programming",compound,study,deliverable,sep="/") 
 
 # Each deliverable has its own folder names
-deliverable_folder_names <-c("adam","adadata","docs","external","macros","output","programs","rand","sdtm","srcdata")
+deliverable_folder_names <-c("adam","adadata","docs","external","macros","output","programs","programs/qc","rand","sdtm","srcdata")
 
 # Create _envsetup.yml file in current directory
 dir <- "."
@@ -30,7 +30,7 @@ yaml_content <- {
     
     # Create the paths section
     paths_section <- c(sapply(1:length(deliverable_folder_names), function(i) {
-        paste0("    ", deliverable_folder_names[i], ": !expr env_test<-paste0(\"dev_\",Sys.getenv(\"USER\"),\"/\"); if (grepl(env_test,getwd())) {env=paste0(\"_\",env_test)} else if (grepl(\"preprod/\",getwd())) {env=\"_preprod/\"} else { env=\"\" }; if (env != \"\") { dir <- paste0(\"", base_folder, "\",env,\"/",deliverable_folder_names[i],"\") } else { dir <- paste0(\"", base_folder, "\",env,\"/",deliverable_folder_names[i],"\") }; if (Sys.getenv(\"SYCAMORE_TOKEN\")!=\"\") { file.path(\"",base_folder_sycamore,"\", dir) } else { file.path(\"",base_folder_rstudio,"\", dir) }")
+        paste0("    ", gsub("/", "_", deliverable_folder_names[i]), ": !expr env_test<-paste0(\"dev_\",Sys.getenv(\"USER\"),\"/\"); if (grepl(env_test,getwd())) {env=paste0(\"_\",env_test)} else if (grepl(\"preprod/\",getwd())) {env=\"_preprod/\"} else { env=\"\" }; if (env != \"\") { dir <- paste0(\"", base_folder, "\",env,\"/",deliverable_folder_names[i],"\") } else { dir <- paste0(\"", base_folder, "\",env,\"/",deliverable_folder_names[i],"\") }; if (Sys.getenv(\"SYCAMORE_TOKEN\")!=\"\") { file.path(\"",base_folder_sycamore,"\", dir) } else { file.path(\"",base_folder_rstudio,"\", dir) }")
     }))
 
     

@@ -7,3 +7,5 @@ envsetup_config <- config::get(file = "_envsetup.yml")
 rprofile(envsetup_config)
 
 macros
+
+programs_qc
